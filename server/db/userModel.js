@@ -7,7 +7,13 @@ const UserSchema = new mongoose.Schema({
         unique: [true, "Email Exist"],
       },
 
-      name: {
+      first: {
+        type: String,
+        required: [true, "Please provide a name!"],
+        unique: false,
+      },
+
+      last: {
         type: String,
         required: [true, "Please provide a name!"],
         unique: false,
@@ -22,6 +28,21 @@ const UserSchema = new mongoose.Schema({
       user_type: {
         type: String,
         required: [true, "Please provide a user type!"],
+        // unique: false,
+      },
+
+      college: {
+        type: String,
+        // unique: false,
+      },
+
+      major: {
+        type: String,
+        // unique: false,
+      },
+
+      grade: {
+        type: String,
         // unique: false,
       },
   })

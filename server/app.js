@@ -36,9 +36,8 @@ app.get("/", (request, response, next) => {
   next();
 });
 
-
 // register endpoint
-app.post("/register", (request, response) => {
+app.post("/registerstudent", (request, response) => {
   // hash the password
   bcrypt
     .hash(request.body.password, 10)
@@ -46,9 +45,11 @@ app.post("/register", (request, response) => {
       // create a new user instance and collect the data
       const user = new User({
         email: request.body.email,
-        name: request.body.name,
+        first: request.body.first,
+        last: request.body.last,
         password: hashedPassword,
-        user_type: request.body.type
+        user_type: request.body.type,
+        grade: request.body.grade
       });
 
       // save the new user
@@ -57,16 +58,65 @@ app.post("/register", (request, response) => {
         .then((result) => {
           response.status(201).send({
             email: request.body.email,
-            name: request.body.name,
-            type: request.body.user_type,
-            _id: result._id
+            first: request.body.first,
+            last: request.body.last,
+            type: request.body.type,
+            _id: result._id,
+            grade: request.body.grade
           });
         })
         // catch error if the new user wasn't added successfully to the database
         .catch((error) => {
           response.status(500).send({
-            message: error.message,
-            error,
+            message: error.message
+          });
+        });
+    })
+    // catch error if the password hash isn't successful
+    .catch((e) => {
+      response.status(500).send({
+        message: "Password was not hashed successfully",
+        e,
+      });
+    });
+});
+
+
+// register endpoint
+app.post("/registermentor", (request, response) => {
+  // hash the password
+  bcrypt
+    .hash(request.body.password, 10)
+    .then((hashedPassword) => {
+      // create a new user instance and collect the data
+      const user = new User({
+        email: request.body.email,
+        first: request.body.first,
+        last: request.body.last,
+        password: hashedPassword,
+        user_type: request.body.type,
+        college: request.body.college,
+        major: request.body.major,
+      });
+
+      // save the new user
+      user.save()
+        // return success if the new user is added to the database successfully
+        .then((result) => {
+          response.status(201).send({
+            email: request.body.email,
+            first: request.body.first,
+            last: request.body.last,
+            type: request.body.type,
+            _id: result._id,
+            college: request.body.college,
+            major: request.body.major,
+          });
+        })
+        // catch error if the new user wasn't added successfully to the database
+        .catch((error) => {
+          response.status(500).send({
+            message: error.message
           });
         });
     })
