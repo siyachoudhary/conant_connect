@@ -156,14 +156,32 @@ app.post("/login", (request, response) => {
             "RANDOM-TOKEN",
             { expiresIn: "24h" }
           );
-          //   return success response
-          response.status(200).send({
-            email: user.email,
-            name: user.name,
-            _id: user._id,
-            profile: user.imgProfile,
-            token,
-          });
+
+          if(user.user_type=="mentor"){
+            //   return success response for mentor
+            response.status(200).send({
+              email: user.email,
+              first: user.first,
+              last: user.last,
+              _id: user._id,
+              college: user.college,
+              major: college.major,
+              type: user.user_type,
+              token,
+            });
+          }else{
+            //   return success response for student
+            response.status(200).send({
+              email: user.email,
+              first: user.first,
+              last: user.last,
+              _id: user._id,
+              grade: user.grade,
+              type: user.user_type,
+              token,
+            });
+          }
+          
         })
         // catch error if password does not match
         .catch((error) => {
