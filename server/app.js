@@ -1,6 +1,7 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-
+const nodemailer = require("nodemailer");
+const cors = require("cors");
 const express = require("express");
 const app = express();
 const bodyParser = require('body-parser');
@@ -36,21 +37,134 @@ app.get("/", (request, response, next) => {
   next();
 });
 
+app.use(cors());
+app.use(express.json({ limit: "25mb" }));
+app.use(express.urlencoded({ limit: "25mb" }));
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  next();
+});
+
+function sendEmail({ recipient_email, OTP }) {
+  return new Promise((resolve, reject) => {
+    var transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.MY_EMAIL,
+        pass: process.env.MY_PASSWORD,
+      },
+    });
+
+    const mail_configs = {
+      from: process.env.MY_EMAIL,
+      to: recipient_email,
+      subject: "CONANT CONNECT PASSWORD RECOVERY",
+      html: `<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>CodePen - OTP Email Template</title>
+  
+
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<div style="font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2">
+  <div style="margin:50px auto;width:70%;padding:20px 0">
+    <div style="border-bottom:1px solid #eee">
+      <a href="" style="font-size:1.4em;color: #00466a;text-decoration:none;font-weight:600">Conant Connect</a>
+    </div>
+    <p style="font-size:1.1em">Hi,</p>
+    <p>Use the following OTP to complete your Password Recovery Procedure. OTP is valid for 5 minutes</p>
+    <h2 style="background: #00466a;margin: 0 auto;width: max-content;padding: 0 10px;color: #fff;border-radius: 4px;">${OTP}</h2>
+    <p style="font-size:0.9em;">Regards,<br />Conant Connect Team</p>
+    <hr style="border:none;border-top:1px solid #eee" />
+    <div style="float:right;padding:8px 0;color:#aaa;font-size:0.8em;line-height:1;font-weight:300">
+      <p>Conant Connect</p>
+    </div>
+  </div>
+</div>
+<!-- partial -->
+  
+</body>
+</html>`,
+    };
+    transporter.sendMail(mail_configs, function (error, info) {
+      if (error) {
+        console.log(error);
+        return reject({ message: `An error has occured` });
+      }
+      return resolve({ message: "Email sent succesfuly" });
+    });
+  });
+}
+
+app.post("/send_recovery_email", (req, res) => {
+  sendEmail(req.body)
+    .then((response) => res.send(response.message))
+    .catch((error) => res.status(500).send(error.message));
+});
+
+// reset password endpoint
+app.post("/resetPassword", (request, response) => {
+  // hash the password
+  bcrypt
+    .hash(request.body.password, 10)
+    .then((hashedPassword) => {
+      User.updateOne({ email: request.body.email }, { "$set":{"password": hashedPassword}})
+        // return success if the new user is added to the database successfully
+        
+        .then((user) => {
+
+          User.findOne({ email: request.body.email }) 
+          .then((user) => {
+            if(user.user_type=="student"){
+              response.status(201).send({
+                email: user.email,
+                first: user.first,
+                last: user.last,
+                type: user.user_type,
+                _id: user._id,
+                grade:user.grade
+              });
+            }else{
+              response.status(201).send({
+                email: user.email,
+                first: user.first,
+                last: user.last,
+                type: user.user_type,
+                _id: user._id,
+                college: user.college,
+                major: user.major,
+              });
+            }
+        })
+        })
+        // catch error if the new user wasn't added successfully to the database
+        .catch((error) => {
+          response.status(500).send({
+            message: error.message
+          });
+        });
+    })
+    // catch error if the password hash isn't successful
+    .catch((e) => {
+      response.status(500).send({
+        message: "Password was not hashed successfully",
+        e,
+      });
+    });
+});
+
 // register endpoint
 app.post("/registerstudent", (request, response) => {
   // hash the password
   bcrypt
     .hash(request.body.password, 10)
     .then((hashedPassword) => {
-      // create a new user instance and collect the data
-      const user = new User({
-        email: request.body.email,
-        first: request.body.first,
-        last: request.body.last,
-        password: hashedPassword,
-        user_type: request.body.type,
-        grade: request.body.grade
-      });
+      User.findOne({ email: request.body.email })
+      // if email exists
+      .then((user) => {
 
       // save the new user
       user.save()
@@ -80,6 +194,8 @@ app.post("/registerstudent", (request, response) => {
       });
     });
 });
+
+})
 
 
 // register endpoint
