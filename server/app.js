@@ -100,9 +100,24 @@ function sendEmail({ recipient_email, OTP }) {
 }
 
 app.post("/send_recovery_email", (req, res) => {
-  sendEmail(req.body)
-    .then((response) => res.send(response.message))
-    .catch((error) => res.status(500).send(error.message));
+  User.findOne({ email: req.body.recipient_email })
+  .then((user)=>{
+    if(user==null){
+      res.status(500).send({
+        message: error.message
+      });
+    }else{
+      sendEmail(req.body)
+      .then((response) => res.send(response.message))
+      .catch((error) => res.status(500).send(error.message));
+    }
+  })
+  .catch((error)=>{
+    res.status(500).send({
+      message: error.message
+    });
+  })
+  
 });
 
 // reset password endpoint
