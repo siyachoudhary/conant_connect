@@ -148,9 +148,7 @@ app.post("/resetPassword", (request, response) => {
                 first: user.first,
                 last: user.last,
                 type: user.user_type,
-                _id: user._id,
-                college: user.college,
-                major: user.major,
+                _id: user._id
               });
             }
         })
@@ -225,9 +223,7 @@ app.post("/registermentor", (request, response) => {
         first: request.body.first,
         last: request.body.last,
         password: hashedPassword,
-        user_type: request.body.type,
-        college: request.body.college,
-        major: request.body.major,
+        user_type: request.body.type
       });
 
       // save the new user
@@ -239,9 +235,7 @@ app.post("/registermentor", (request, response) => {
             first: request.body.first,
             last: request.body.last,
             type: request.body.type,
-            _id: result._id,
-            college: request.body.college,
-            major: request.body.major,
+            _id: result._id
           });
         })
         // catch error if the new user wasn't added successfully to the database
@@ -295,8 +289,6 @@ app.post("/login", (request, response) => {
               first: user.first,
               last: user.last,
               _id: user._id,
-              college: user.college,
-              major: college.major,
               type: user.user_type,
               token,
             });
