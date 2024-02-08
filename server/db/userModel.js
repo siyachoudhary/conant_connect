@@ -31,6 +31,12 @@ const UserSchema = new mongoose.Schema({
         // unique: false,
       },
 
+      complete: {
+        type: Boolean,
+        // unique: false,
+      },
+
+
       college: {
         type: String,
         // unique: false,
