@@ -175,9 +175,15 @@ app.post("/registerstudent", (request, response) => {
   bcrypt
     .hash(request.body.password, 10)
     .then((hashedPassword) => {
-      User.findOne({ email: request.body.email })
-      // if email exists
-      .then((user) => {
+      const user = new User({
+        email: request.body.email,
+        first: request.body.first,
+        last: request.body.last,
+        password: hashedPassword,
+        grade: request.body.grade,
+        user_type: request.body.type,
+        complete: request.body.complete
+      });
 
       // save the new user
       user.save()
@@ -189,7 +195,8 @@ app.post("/registerstudent", (request, response) => {
             last: request.body.last,
             type: request.body.type,
             _id: result._id,
-            grade: request.body.grade
+            grade: request.body.grade,
+            complete: request.body.complete
           });
         })
         // catch error if the new user wasn't added successfully to the database
@@ -198,14 +205,6 @@ app.post("/registerstudent", (request, response) => {
             message: error.message
           });
         });
-    })
-    // catch error if the password hash isn't successful
-    .catch((e) => {
-      response.status(500).send({
-        message: "Password was not hashed successfully",
-        e,
-      });
-    });
 });
 
 })
@@ -223,7 +222,8 @@ app.post("/registermentor", (request, response) => {
         first: request.body.first,
         last: request.body.last,
         password: hashedPassword,
-        user_type: request.body.type
+        user_type: request.body.type,
+        complete: request.body.complete
       });
 
       // save the new user
@@ -235,7 +235,8 @@ app.post("/registermentor", (request, response) => {
             first: request.body.first,
             last: request.body.last,
             type: request.body.type,
-            _id: result._id
+            _id: result._id,
+            complete: request.body.complete
           });
         })
         // catch error if the new user wasn't added successfully to the database
@@ -290,6 +291,7 @@ app.post("/login", (request, response) => {
               last: user.last,
               _id: user._id,
               type: user.user_type,
+              complete: user.complete,
               token,
             });
           }else{
@@ -301,6 +303,7 @@ app.post("/login", (request, response) => {
               _id: user._id,
               grade: user.grade,
               type: user.user_type,
+              complete: user.complete,
               token,
             });
           }
