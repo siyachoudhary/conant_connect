@@ -236,7 +236,10 @@ app.post("/registermentor", (request, response) => {
             last: request.body.last,
             type: request.body.type,
             _id: result._id,
-            complete: request.body.complete
+            complete: request.body.complete,
+            college: request.body.college,
+            major: request.body.college,
+            bio: request.body.bio
           });
         })
         // catch error if the new user wasn't added successfully to the database
@@ -292,6 +295,9 @@ app.post("/login", (request, response) => {
               _id: user._id,
               type: user.user_type,
               complete: user.complete,
+              college: request.body.college,
+              major: request.body.college,
+              bio: request.body.bio,
               token,
             });
           }else{
@@ -322,6 +328,68 @@ app.post("/login", (request, response) => {
       response.status(404).send({
         message: "Email not found",
         e,
+      });
+    });
+});
+
+
+// edit mentor endpoint
+app.post("/editmentor", (request, response) => {
+      // create a new user instance and collect the data
+    User.updateOne({ email: request.body.email }, { "$set":{"first": request.body.first, "last":request.body.last, "college":request.body.college, "major":request.body.major, "bio":request.body.bio, "complete":request.body.complete}}, {runValidators:true,new:true}) 
+    .then((result) => {
+    User.findOne({ email: request.body.email })
+      .then((user) =>{
+        // return success if the new user is edited to the database successfully
+          response.status(201).send({
+            email: request.body.email,
+            first: request.body.first,
+            last: request.body.last,
+            type: user.user_type,
+            _id: user._id,
+            complete: request.body.complete,
+            college: request.body.college,
+            major: request.body.college,
+            bio: request.body.bio
+          });
+        })
+      })
+        // catch error if the new user wasn't edited successfully to the database
+        .catch((error) => {
+          response.status(500).send({
+            message: error.message
+          });
+        });
+});
+
+// edit student endpoint
+app.post("/editstudent", (request, response) => {
+  // create a new user instance and collect the data
+User.updateOne({ email: request.body.email }, { "$set":{"first": request.body.first, "last":request.body.last, "grade":request.body.grade, "bio":request.body.bio, "complete":request.body.complete}}, {runValidators:true,new:true}) 
+
+    // return success if the new user is edited to the database successfully
+    .then((result) => {
+
+      User.findOne({ email: request.body.email })
+      .then((user) =>{
+        console.log(user)
+        response.status(201).send({
+          email: request.body.email,
+          first: request.body.first,
+          last: request.body.last,
+          type: user.user_type,
+          _id: user._id,
+          complete: request.body.complete,
+          grade: request.body.grade,
+          bio: request.body.bio
+        });
+      })
+      
+    })
+    // catch error if the new user wasn't added edited to the database
+    .catch((error) => {
+      response.status(500).send({
+        message: error.message
       });
     });
 });
