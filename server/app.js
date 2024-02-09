@@ -182,7 +182,8 @@ app.post("/registerstudent", (request, response) => {
         password: hashedPassword,
         grade: request.body.grade,
         user_type: request.body.type,
-        complete: request.body.complete
+        complete: request.body.complete,
+        bio: ""
       });
 
       // save the new user
@@ -193,9 +194,10 @@ app.post("/registerstudent", (request, response) => {
             email: request.body.email,
             first: request.body.first,
             last: request.body.last,
-            type: request.body.type,
+            type: request.body.user_type,
             _id: result._id,
-            grade: request.body.grade,
+            grade: result.grade,
+            bio: result.bio,
             complete: request.body.complete
           });
         })
@@ -223,7 +225,10 @@ app.post("/registermentor", (request, response) => {
         last: request.body.last,
         password: hashedPassword,
         user_type: request.body.type,
-        complete: request.body.complete
+        complete: request.body.complete,
+        college: "",
+        major: "",
+        bio: ""
       });
 
       // save the new user
@@ -237,9 +242,9 @@ app.post("/registermentor", (request, response) => {
             type: request.body.type,
             _id: result._id,
             complete: request.body.complete,
-            college: request.body.college,
-            major: request.body.college,
-            bio: request.body.bio
+            college: result.college,
+            major: result.major,
+            bio: result.bio
           });
         })
         // catch error if the new user wasn't added successfully to the database
@@ -295,9 +300,9 @@ app.post("/login", (request, response) => {
               _id: user._id,
               type: user.user_type,
               complete: user.complete,
-              college: request.body.college,
-              major: request.body.college,
-              bio: request.body.bio,
+              college: user.college,
+              major: user.major,
+              bio: user.bio,
               token,
             });
           }else{
@@ -349,7 +354,7 @@ app.post("/editmentor", (request, response) => {
             _id: user._id,
             complete: request.body.complete,
             college: request.body.college,
-            major: request.body.college,
+            major: request.body.major,
             bio: request.body.bio
           });
         })
