@@ -51,6 +51,11 @@ const UserSchema = new mongoose.Schema({
         type: String,
         // unique: false,
       },
+
+      bio: {
+        type: String,
+        // unique: false,
+      },
   })
 
   module.exports = mongoose.model.Users || mongoose.model("Users", UserSchema);
