@@ -195,7 +195,7 @@ app.post("/registerstudent", (request, response) => {
             email: request.body.email,
             first: request.body.first,
             last: request.body.last,
-            type: request.body.user_type,
+            type: request.body.type,
             _id: result._id,
             grade: result.grade,
             bio: result.bio,
