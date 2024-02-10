@@ -183,7 +183,8 @@ app.post("/registerstudent", (request, response) => {
         grade: request.body.grade,
         user_type: request.body.type,
         complete: request.body.complete,
-        bio: ""
+        bio: "",
+        interest: []
       });
 
       // save the new user
@@ -198,7 +199,8 @@ app.post("/registerstudent", (request, response) => {
             _id: result._id,
             grade: result.grade,
             bio: result.bio,
-            complete: request.body.complete
+            complete: request.body.complete,
+            interest: result.interest
           });
         })
         // catch error if the new user wasn't added successfully to the database
@@ -228,7 +230,8 @@ app.post("/registermentor", (request, response) => {
         complete: request.body.complete,
         college: "",
         major: "",
-        bio: ""
+        bio: "",
+        interest: []
       });
 
       // save the new user
@@ -244,7 +247,8 @@ app.post("/registermentor", (request, response) => {
             complete: request.body.complete,
             college: result.college,
             major: result.major,
-            bio: result.bio
+            bio: result.bio,
+            interest: result.interest
           });
         })
         // catch error if the new user wasn't added successfully to the database
@@ -303,6 +307,7 @@ app.post("/login", (request, response) => {
               college: user.college,
               major: user.major,
               bio: user.bio,
+              interest: user.interest,
               token,
             });
           }else{
@@ -315,6 +320,7 @@ app.post("/login", (request, response) => {
               grade: user.grade,
               type: user.user_type,
               complete: user.complete,
+              interest: user.interest,
               token,
             });
           }
@@ -341,7 +347,7 @@ app.post("/login", (request, response) => {
 // edit mentor endpoint
 app.post("/editmentor", (request, response) => {
       // create a new user instance and collect the data
-    User.updateOne({ email: request.body.email }, { "$set":{"first": request.body.first, "last":request.body.last, "college":request.body.college, "major":request.body.major, "bio":request.body.bio, "complete":request.body.complete}}, {runValidators:true,new:true}) 
+    User.updateOne({ email: request.body.email }, { "$set":{"first": request.body.first, "last":request.body.last, "college":request.body.college, "major":request.body.major, "bio":request.body.bio, "complete":request.body.complete, "interest": request.body.interest}}, {runValidators:true,new:true}) 
     .then((result) => {
     User.findOne({ email: request.body.email })
       .then((user) =>{
@@ -355,7 +361,8 @@ app.post("/editmentor", (request, response) => {
             complete: request.body.complete,
             college: request.body.college,
             major: request.body.major,
-            bio: request.body.bio
+            bio: request.body.bio,
+            interest: request.body.interest,
           });
         })
       })
@@ -370,7 +377,7 @@ app.post("/editmentor", (request, response) => {
 // edit student endpoint
 app.post("/editstudent", (request, response) => {
   // create a new user instance and collect the data
-User.updateOne({ email: request.body.email }, { "$set":{"first": request.body.first, "last":request.body.last, "grade":request.body.grade, "bio":request.body.bio, "complete":request.body.complete}}, {runValidators:true,new:true}) 
+  User.updateOne({ email: request.body.email }, { "$set":{"first": request.body.first, "last":request.body.last, "grade":request.body.grade, "bio":request.body.bio, "complete":request.body.complete, "interest": request.body.interest}}, {runValidators:true,new:true}) 
 
     // return success if the new user is edited to the database successfully
     .then((result) => {
@@ -386,7 +393,8 @@ User.updateOne({ email: request.body.email }, { "$set":{"first": request.body.fi
           _id: user._id,
           complete: request.body.complete,
           grade: request.body.grade,
-          bio: request.body.bio
+          bio: request.body.bio,
+          interest: request.body.interest,
         });
       })
       

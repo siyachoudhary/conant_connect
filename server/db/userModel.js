@@ -56,6 +56,11 @@ const UserSchema = new mongoose.Schema({
         type: String,
         // unique: false,
       },
+
+      interest: {
+        type: Array,
+        // unique: false,
+      },
   })
 
   module.exports = mongoose.model.Users || mongoose.model("Users", UserSchema);
