@@ -407,6 +407,24 @@ app.post("/editstudent", (request, response) => {
     });
 });
 
+// delete endpoint
+app.post("/deleteUser", (request, response) => {
+  // check if email exists
+  User.deleteOne({ email: request.body.email }) 
+    .then(() => {
+      response.status(200).send({
+        message: "user deleted successfully",
+      });
+    })
+    .catch((e) => {
+      console.log(e)
+      response.status(404).send({
+        message: "Could not delete user",
+        e,
+      });
+    });
+});
+
 // // update endpoint
 // app.post("/updateUser/:email", (request, response) => {
 //   // check if email exists
@@ -477,23 +495,6 @@ app.post("/editstudent", (request, response) => {
 //     });
 // });
 
-// // delete endpoint
-// app.post("/deleteUser/:email", (request, response) => {
-//   // check if email exists
-//   User.deleteOne({ email: request.params.email }) 
-//     .then(() => {
-//       response.status(200).send({
-//         message: "user deleted successfully",
-//       });
-//     })
-//     .catch((e) => {
-//       console.log(e)
-//       response.status(404).send({
-//         message: "Could not delete user",
-//         e,
-//       });
-//     });
-// });
 
 // //  get all user friends
 // app.get("/getUsers/:emailStr", (request, response) => { 
