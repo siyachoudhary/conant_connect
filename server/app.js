@@ -425,6 +425,23 @@ app.post("/deleteUser", (request, response) => {
     });
 });
 
+app.get("/findmentors", (request, response) => { 
+  User.find({ user_type: "mentor"}) 
+    .then((users) => {
+      console.log(users)
+      response.status(200).send({
+        users
+      });
+    })
+    .catch((e) => {
+      console.log(e)
+      response.status(404).send({
+        message: "user not found, proceed",
+        e,
+      });
+    });
+});
+
 // // update endpoint
 // app.post("/updateUser/:email", (request, response) => {
 //   // check if email exists
