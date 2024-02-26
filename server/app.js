@@ -182,7 +182,9 @@ app.post("/registerstudent", (request, response) => {
         password: hashedPassword,
         grade: request.body.grade,
         user_type: request.body.type,
-        complete: request.body.complete
+        complete: request.body.complete,
+        bio: "",
+        interest: []
       });
 
       // save the new user
@@ -195,8 +197,10 @@ app.post("/registerstudent", (request, response) => {
             last: request.body.last,
             type: request.body.type,
             _id: result._id,
-            grade: request.body.grade,
-            complete: request.body.complete
+            grade: result.grade,
+            bio: result.bio,
+            complete: request.body.complete,
+            interest: result.interest
           });
         })
         // catch error if the new user wasn't added successfully to the database
@@ -223,7 +227,11 @@ app.post("/registermentor", (request, response) => {
         last: request.body.last,
         password: hashedPassword,
         user_type: request.body.type,
-        complete: request.body.complete
+        complete: request.body.complete,
+        college: "",
+        major: "",
+        bio: "",
+        interest: []
       });
 
       // save the new user
@@ -237,9 +245,10 @@ app.post("/registermentor", (request, response) => {
             type: request.body.type,
             _id: result._id,
             complete: request.body.complete,
-            college: request.body.college,
-            major: request.body.college,
-            bio: request.body.bio
+            college: result.college,
+            major: result.major,
+            bio: result.bio,
+            interest: result.interest
           });
         })
         // catch error if the new user wasn't added successfully to the database
@@ -295,9 +304,10 @@ app.post("/login", (request, response) => {
               _id: user._id,
               type: user.user_type,
               complete: user.complete,
-              college: request.body.college,
-              major: request.body.college,
-              bio: request.body.bio,
+              college: user.college,
+              major: user.major,
+              bio: user.bio,
+              interest: user.interest,
               token,
             });
           }else{
@@ -310,6 +320,7 @@ app.post("/login", (request, response) => {
               grade: user.grade,
               type: user.user_type,
               complete: user.complete,
+              interest: user.interest,
               token,
             });
           }
@@ -336,7 +347,7 @@ app.post("/login", (request, response) => {
 // edit mentor endpoint
 app.post("/editmentor", (request, response) => {
       // create a new user instance and collect the data
-    User.updateOne({ email: request.body.email }, { "$set":{"first": request.body.first, "last":request.body.last, "college":request.body.college, "major":request.body.major, "bio":request.body.bio, "complete":request.body.complete}}, {runValidators:true,new:true}) 
+    User.updateOne({ email: request.body.email }, { "$set":{"first": request.body.first, "last":request.body.last, "college":request.body.college, "major":request.body.major, "bio":request.body.bio, "complete":request.body.complete, "interest": request.body.interest}}, {runValidators:true,new:true}) 
     .then((result) => {
     User.findOne({ email: request.body.email })
       .then((user) =>{
@@ -349,8 +360,9 @@ app.post("/editmentor", (request, response) => {
             _id: user._id,
             complete: request.body.complete,
             college: request.body.college,
-            major: request.body.college,
-            bio: request.body.bio
+            major: request.body.major,
+            bio: request.body.bio,
+            interest: request.body.interest,
           });
         })
       })
@@ -365,7 +377,7 @@ app.post("/editmentor", (request, response) => {
 // edit student endpoint
 app.post("/editstudent", (request, response) => {
   // create a new user instance and collect the data
-User.updateOne({ email: request.body.email }, { "$set":{"first": request.body.first, "last":request.body.last, "grade":request.body.grade, "bio":request.body.bio, "complete":request.body.complete}}, {runValidators:true,new:true}) 
+  User.updateOne({ email: request.body.email }, { "$set":{"first": request.body.first, "last":request.body.last, "grade":request.body.grade, "bio":request.body.bio, "complete":request.body.complete, "interest": request.body.interest}}, {runValidators:true,new:true}) 
 
     // return success if the new user is edited to the database successfully
     .then((result) => {
@@ -381,7 +393,8 @@ User.updateOne({ email: request.body.email }, { "$set":{"first": request.body.fi
           _id: user._id,
           complete: request.body.complete,
           grade: request.body.grade,
-          bio: request.body.bio
+          bio: request.body.bio,
+          interest: request.body.interest,
         });
       })
       
@@ -390,6 +403,41 @@ User.updateOne({ email: request.body.email }, { "$set":{"first": request.body.fi
     .catch((error) => {
       response.status(500).send({
         message: error.message
+      });
+    });
+});
+
+// delete endpoint
+app.post("/deleteUser", (request, response) => {
+  // check if email exists
+  User.deleteOne({ email: request.body.email }) 
+    .then(() => {
+      response.status(200).send({
+        message: "user deleted successfully",
+      });
+    })
+    .catch((e) => {
+      console.log(e)
+      response.status(404).send({
+        message: "Could not delete user",
+        e,
+      });
+    });
+});
+
+app.get("/findmentors", (request, response) => { 
+  User.find({ user_type: "mentor"}) 
+    .then((users) => {
+      console.log(users)
+      response.status(200).send({
+        users
+      });
+    })
+    .catch((e) => {
+      console.log(e)
+      response.status(404).send({
+        message: "user not found, proceed",
+        e,
       });
     });
 });
@@ -464,23 +512,6 @@ User.updateOne({ email: request.body.email }, { "$set":{"first": request.body.fi
 //     });
 // });
 
-// // delete endpoint
-// app.post("/deleteUser/:email", (request, response) => {
-//   // check if email exists
-//   User.deleteOne({ email: request.params.email }) 
-//     .then(() => {
-//       response.status(200).send({
-//         message: "user deleted successfully",
-//       });
-//     })
-//     .catch((e) => {
-//       console.log(e)
-//       response.status(404).send({
-//         message: "Could not delete user",
-//         e,
-//       });
-//     });
-// });
 
 // //  get all user friends
 // app.get("/getUsers/:emailStr", (request, response) => { 
